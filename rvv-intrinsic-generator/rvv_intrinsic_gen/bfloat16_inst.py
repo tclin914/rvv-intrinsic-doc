@@ -22,6 +22,7 @@ sequence and grouping.
 
 from intrinsic_decorator import IntrinsicDecorators
 from generator import CompatibleHeaderGenerator, APITestGenerator
+from templates import binary_op_template
 from templates import load_template
 from templates import seg_load_template
 from templates import store_template
@@ -29,6 +30,7 @@ from templates import seg_store_template
 from templates import reint_op_template
 from templates import get_set_diff_lmul_op_template
 from templates import misc_op_template
+from templates import permute_template
 from templates import cvt_op_template
 from templates import mac_template
 from constants import LMULS, WLMULS, NCVTLMULS
@@ -169,6 +171,25 @@ def gen(g):
   g.function_group(misc_op_template, "Vector Creation Intrinsics",
                    "vector-creation", ["vcreate"], TYPES, SEWS, LMULS,
                    decorators.has_no_masking)
+
+  ####################################################################
+  g.start_group("BFloat16 Vector Permutation Intrinsics")
+
+  g.function_group(permute_template, "Vector Slideup Intrinsics",
+                   "vector-slideup", ["slideup"], TYPES, SEWS, LMULS,
+                   decorators.has_masking_no_maskedoff_policy_vslide)
+
+  g.function_group(permute_template, "Vector Slidedown Intrinsics",
+                   "vector-slidedown", ["slidedown"], TYPES, SEWS, LMULS,
+                   decorators.has_masking_maskedoff_policy)
+
+  g.function_group(binary_op_template, "Vector Register Gather Intrinsics",
+                   "vector-register-gather", ["rgather", "rgatherei16"], TYPES,
+                   SEWS, LMULS, decorators.has_masking_maskedoff_policy)
+
+  g.function_group(permute_template, "Vector Compress Intrinsics",
+                   "vector-compress", ["compress"], TYPES, SEWS, LMULS,
+                   decorators.has_no_masking_policy)
 
   ####################################################################
   g.gen_prologue()
