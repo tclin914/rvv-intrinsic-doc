@@ -134,8 +134,16 @@ def misc_group(g):
 def permutation_group(g):
   decorators = IntrinsicDecorators(g.has_tail_policy)
 
+  g.function_group(permute_template, "Vector Slideup Intrinsics",
+                   "vector-slideup", ["slideup"], FTYPES, SEWS, LMULS,
+                   decorators.has_masking_no_maskedoff_policy_vslide)
+
+  g.function_group(permute_template, "Vector Slidedown Intrinsics",
+                   "vector-slidedown", ["slidedown"], FTYPES, SEWS, LMULS,
+                   decorators.has_masking_maskedoff_policy)
+
   g.function_group(binary_op_template, "Vector Register Gather Intrinsics",
-                   "vector-register-gather", ["rgather"], FTYPES,
+                   "vector-register-gather", ["rgather", "rgatherei16"], FTYPES,
                    SEWS, LMULS, decorators.has_masking_maskedoff_policy)
 
   g.function_group(permute_template, "Vector Compress Intrinsics",
