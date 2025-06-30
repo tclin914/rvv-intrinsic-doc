@@ -64,6 +64,8 @@ ZVFHMIN_INST := $(RVV_INTRINSIC_GEN_PATH)/zvfhmin_inst.py
 ZVFH_INST := $(RVV_INTRINSIC_GEN_PATH)/zvfh_inst.py
 # BFloat16 instruction scripts
 BF16_INST := $(RVV_INTRINSIC_GEN_PATH)/bfloat16_inst.py
+# Zvfbfwma instruction scripts
+ZVFBFWMA_INST := $(RVV_INTRINSIC_GEN_PATH)/zvfbfwma_inst.py
 # Script to clang-format the auto-generated adoc files
 CLANG_FORMAT_ADOC = clang_format_autogen
 # Extra flags specified when calling rvv_intrinsic_gen.main
@@ -87,6 +89,10 @@ ZVFH_POLICY_DIR := $(ZVFH_DIR)/policy_funcs
 BF16_DIR := $(DIR)/bfloat16
 # Output directory for bfloat16 policy intrinsics
 BF16_POLICY_DIR := $(BF16_DIR)/policy_funcs
+# Output directory for zvfbfwma non-policy intrinsics
+ZVFBFWMA_DIR := $(DIR)/zvfbfwma
+# Output directory for zvfbfwma policy intrinsics
+ZVFBFWMA_POLICY_DIR := $(ZVFBFWMA_DIR)/policy_funcs
 # Output directory for vector-crypto non-policy intrinsics
 VECTOR_CRYPTO_DIR := $(DIR)/vector-crypto
 # Output directory for vector-crypto policy intrinsics
@@ -179,23 +185,27 @@ endif
 zvfhmin-all: gen-zvfhmin-document gen-zvfhmin-test
 zvfh-all: gen-zvfh-document gen-zvfh-test
 bf16-all: gen-bf16-document gen-bf16-test
+zvfbfwma-all: gen-zvfbfwma-document gen-zvfbfwma-test
 vector-crypto-all: gen-vector-crypto-document gen-vector-crypto-test
 
 gen-document: non-overloaded-doc non-overloaded-docs overloaded-doc overloaded-docs
 gen-zvfhmin-document: zvfhmin-non-overloaded-doc zvfhmin-non-overloaded-docs zvfhmin-overloaded-doc zvfhmin-overloaded-docs
 gen-zvfh-document: zvfh-non-overloaded-doc zvfh-non-overloaded-docs zvfh-overloaded-doc zvfh-overloaded-docs
 gen-bf16-document: bf16-non-overloaded-doc bf16-non-overloaded-docs bf16-overloaded-doc bf16-overloaded-docs
+gen-zvfbfwma-document: zvfbfwma-non-overloaded-doc zvfbfwma-non-overloaded-docs zvfbfwma-overloaded-doc zvfbfwma-overloaded-docs
 gen-vector-crypto-document: vector-crypto-non-overloaded-doc vector-crypto-non-overloaded-docs vector-crypto-overloaded-doc vector-crypto-overloaded-docs
 gen-test: non-overloaded-test overloaded-test gen-llvm-test gen-gnu-test
 gen-zvfhmin-test: zvfhmin-non-overloaded-test zvfhmin-overloaded-test gen-zvfhmin-llvm-test
 gen-zvfh-test: zvfh-non-overloaded-test zvfh-overloaded-test gen-zvfh-llvm-test
 gen-bf16-test: bf16-non-overloaded-test bf16-overloaded-test gen-bf16-llvm-test
+gen-zvfbfwma-test: zvfbfwma-non-overloaded-test zvfbfwma-overloaded-test gen-zvfbfwma-llvm-test
 gen-vector-crypto-test: vector-crypto-non-overloaded-test vector-crypto-overloaded-test gen-vector-crypto-llvm-test
 gen-compatible-header: non-policy-compatible-header policy-compatible-header non-policy-overloaded-compatible-header policy-overloaded-compatible-header
 gen-llvm-test: llvm-non-overloaded-test llvm-overloaded-test
 gen-zvfhmin-llvm-test: zvfhmin-llvm-non-overloaded-test zvfhmin-llvm-overloaded-test
 gen-zvfh-llvm-test: zvfh-llvm-non-overloaded-test zvfh-llvm-overloaded-test
 gen-bf16-llvm-test: bf16-llvm-non-overloaded-test bf16-llvm-overloaded-test
+gen-zvfbfwma-llvm-test: zvfbfwma-llvm-non-overloaded-test zvfbfwma-llvm-overloaded-test
 gen-vector-crypto-llvm-test: vector-crypto-llvm-non-overloaded-test vector-crypto-llvm-overloaded-test
 gen-gnu-test: gnu-overloaded-test gnu-non-overloaded-test
 
@@ -443,6 +453,64 @@ bf16-llvm-overloaded-test:
 	clang-format -i $(BF16_DIR)/llvm-overloaded-tests/*
 	clang-format -i $(BF16_POLICY_DIR)/llvm-overloaded-tests/*
 
+# Zvfbfwma documents
+zvfbfwma-non-overloaded-doc:
+	$(call gen_doc, $(ZVFBFWMA_DIR),intrinsic_funcs.adoc,non-overloaded-doc,--skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_doc, $(ZVFBFWMA_POLICY_DIR),intrinsic_funcs.adoc,non-overloaded-doc,--has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call clang_format_adoc, --file, $(ZVFBFWMA_DIR)/intrinsic_funcs.adoc)
+	$(call clang_format_adoc, --file, $(ZVFBFWMA_POLICY_DIR)/intrinsic_funcs.adoc)
+
+zvfbfwma-non-overloaded-docs:
+	$(call gen_doc, $(ZVFBFWMA_DIR),intrinsic_funcs,non-overloaded-docs,--skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_doc, $(ZVFBFWMA_POLICY_DIR),intrinsic_funcs,non-overloaded-docs,--has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call clang_format_adoc, --folder, $(ZVFBFWMA_DIR)/intrinsic_funcs)
+	$(call clang_format_adoc, --folder, $(ZVFBFWMA_POLICY_DIR)/intrinsic_funcs)
+
+zvfbfwma-overloaded-doc:
+	$(call gen_doc, $(ZVFBFWMA_DIR),overloaded_intrinsic_funcs.adoc,overloaded-doc,--skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_doc, $(ZVFBFWMA_POLICY_DIR),overloaded_intrinsic_funcs.adoc,overloaded-doc,--has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call clang_format_adoc, --file, $(ZVFBFWMA_DIR)/overloaded_intrinsic_funcs.adoc)
+	$(call clang_format_adoc, --file, $(ZVFBFWMA_POLICY_DIR)/overloaded_intrinsic_funcs.adoc)
+
+zvfbfwma-overloaded-docs:
+	$(call gen_doc, $(ZVFBFWMA_DIR),overloaded_intrinsic_funcs,overloaded-docs,--skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_doc, $(ZVFBFWMA_POLICY_DIR),overloaded_intrinsic_funcs,overloaded-docs,--has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call clang_format_adoc, --folder, $(ZVFBFWMA_DIR)/overloaded_intrinsic_funcs)
+	$(call clang_format_adoc, --folder, $(ZVFBFWMA_POLICY_DIR)/overloaded_intrinsic_funcs)
+
+# Zvfbfwma tests
+# Generate non-overloaded intrinsic testing C source files
+zvfbfwma-non-overloaded-test:
+	$(call gen_tests,$(ZVFBFWMA_DIR)/api-testing,non-overloaded-test,--skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_tests,$(ZVFBFWMA_POLICY_DIR)/api-testing,non-overloaded-test,--has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	clang-format -i $(ZVFBFWMA_DIR)/api-testing/*
+	clang-format -i $(ZVFBFWMA_POLICY_DIR)/api-testing/*
+
+# Generate overloaded intrinsic testing C source files
+zvfbfwma-overloaded-test:
+	$(call gen_tests,$(ZVFBFWMA_DIR)/overloaded-api-testing,overloaded-test,--skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_tests,$(ZVFBFWMA_POLICY_DIR)/overloaded-api-testing,overloaded-test,--has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	clang-format -i $(ZVFBFWMA_DIR)/overloaded-api-testing/*
+	clang-format -i $(ZVFBFWMA_POLICY_DIR)/overloaded-api-testing/*
+
+# Generate non-overloaded intrinsic testing C source files
+zvfbfwma-llvm-non-overloaded-test:
+	$(call gen_tests,$(ZVFBFWMA_DIR)/llvm-api-tests,non-overloaded-test,--toolchain-type llvm --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_tests,$(ZVFBFWMA_POLICY_DIR)/llvm-api-tests,non-overloaded-test,--toolchain-type llvm --has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call replace_float, $(ZVFBFWMA_DIR)/llvm-api-tests)
+	$(call replace_float, $(ZVFBFWMA_POLICY_DIR)/llvm-api-tests)
+	clang-format -i $(ZVFBFWMA_DIR)/llvm-api-tests/*
+	clang-format -i $(ZVFBFWMA_POLICY_DIR)/overloaded-api-testing/*
+
+# Generate overloaded intrinsic testing C source files
+zvfbfwma-llvm-overloaded-test:
+	$(call gen_tests,$(ZVFBFWMA_DIR)/llvm-overloaded-tests,overloaded-test,--toolchain-type llvm --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call gen_tests,$(ZVFBFWMA_POLICY_DIR)/llvm-overloaded-tests,overloaded-test,--toolchain-type llvm --has-policy --skip-default-inst --vendor-inst $(ZVFBFWMA_INST))
+	$(call replace_float, $(ZVFBFWMA_DIR)/llvm-overloaded-tests)
+	$(call replace_float, $(ZVFBFWMA_POLICY_DIR)/llvm-overloaded-tests)
+	clang-format -i $(ZVFBFWMA_DIR)/llvm-overloaded-tests/*
+	clang-format -i $(ZVFBFWMA_POLICY_DIR)/llvm-overloaded-tests/*
+
 # Vector crypto documents
 vector-crypto-non-overloaded-doc:
 	$(call gen_doc,$(VECTOR_CRYPTO_DIR),intrinsic_funcs.adoc,non-overloaded-doc,--gen-vector-crypto $(EXTRA_FLAG))
@@ -542,6 +610,10 @@ git-commit-bf16-all:
 	make git-commit-autogen-bf16-doc OUTPUT_DIR=${OUTPUT_DIR}
 	make git-commit-autogen-bf16-test OUTPUT_DIR=${OUTPUT_DIR}
 
+git-commit-zvfbfwma-all:
+	make git-commit-autogen-zvfbfwma-doc OUTPUT_DIR=${OUTPUT_DIR}
+	make git-commit-autogen-zvfbfwma-test OUTPUT_DIR=${OUTPUT_DIR}
+
 git-commit-vector-crypto-all:
 	make git-commit-autogen-vector-crypto-doc OUTPUT_DIR=${OUTPUT_DIR}
 	make git-commit-autogen-vector-crypto-test OUTPUT_DIR=${OUTPUT_DIR}
@@ -566,6 +638,11 @@ git-commit-autogen-bf16-doc:
 	make gen-bf16-document OUTPUT_DIR=${OUTPUT_DIR}
 	git add ${BF16_DIR}/*
 	git commit -m "[Auto-gen] Update bfloat16 documents under ${OUTPUT_DIR}. (make git-commit-autogen-bf16-doc)"
+
+git-commit-autogen-zvfbfwma-doc:
+	make gen-zvfbfwma-document OUTPUT_DIR=${OUTPUT_DIR}
+	git add ${ZVFBFWMA_DIR}/*
+	git commit -m "[Auto-gen] Update zvfbfwma documents under ${OUTPUT_DIR}. (make git-commit-autogen-zvfbfwma-doc)"
 
 git-commit-autogen-vector-crypto-doc:
 	make gen-vector-crypto-document OUTPUT_DIR=${OUTPUT_DIR}
@@ -592,6 +669,11 @@ git-commit-autogen-bf16-test:
 	make gen-bf16-test
 	git add ${BF16_DIR}/*
 	git commit -m "[Auto-gen] Update bfloat16 tests under ${OUTPUT_DIR}. (make git-commit-autogen-bf16-test)"
+
+git-commit-autogen-zvfbfwma-test:
+	make gen-zvfbfwma-test
+	git add ${ZVFBFWMA_DIR}/*
+	git commit -m "[Auto-gen] Update zvfbfwma tests under ${OUTPUT_DIR}. (make git-commit-autogen-zvfbfwma-test)"
 
 git-commit-autogen-vector-crypto-test:
 	make gen-vector-crypto-test

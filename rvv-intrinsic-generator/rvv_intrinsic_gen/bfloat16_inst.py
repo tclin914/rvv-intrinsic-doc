@@ -134,14 +134,6 @@ def gen(g):
                    SEWS, WLMULS, decorators.has_masking_maskedoff_policy)
 
   ####################################################################
-  g.start_group("BFloat16 Arithmetic Intrinsics")
-
-  g.function_group(mac_template,
-                   "Vector Widening Multiply-Accumulate Intrinsics",
-                   "bf16-widening-multiply-accumulate", ["wmaccbf16"], TYPES,
-                   SEWS, WLMULS, decorators.has_masking_no_maskedoff_policy_frm)
-
-  ####################################################################
   g.start_group("BFloat16 Miscellaneous Vector Utility Intrinsics")
 
   g.function_group(reint_op_template, "Reinterpret Cast Conversion Intrinsics",
