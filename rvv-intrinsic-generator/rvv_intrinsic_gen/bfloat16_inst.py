@@ -41,8 +41,8 @@ TYPES = ["bfloat"]
 
 llvm_header = r"""// REQUIRES: riscv-registered-target
 // RUN: %clang_cc1 -triple riscv64 -target-feature +v \
-// RUN:   -target-feature +experimental-zvfbfmin \
-// RUN:   -target-feature +experimental-zvfbfwma -disable-O0-optnone \
+// RUN:   -target-feature +zvfbfmin \
+// RUN:   -target-feature +zvfbfwma -disable-O0-optnone \
 // RUN:   -emit-llvm %s -o - | opt -S -passes=mem2reg | \
 // RUN:   FileCheck --check-prefix=CHECK-RV64 %s
 
