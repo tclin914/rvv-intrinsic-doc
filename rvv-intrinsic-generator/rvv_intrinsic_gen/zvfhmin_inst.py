@@ -25,7 +25,7 @@ from generator import CompatibleHeaderGenerator, APITestGenerator
 from zvfhmin_utils import load_store_group, seg_load_store_group, misc_group, permutation_group, conversion_group
 
 llvm_header = r"""// REQUIRES: riscv-registered-target
-// RUN: %clang_cc1 -triple riscv64 -target-feature +v -target-feature +zfh \
+// RUN: %clang_cc1 -triple riscv64 -target-feature +zve64x \
 // RUN:   -target-feature +zvfhmin -disable-O0-optnone \
 // RUN:   -emit-llvm %s -o - | opt -S -passes=mem2reg | \
 // RUN:   FileCheck --check-prefix=CHECK-RV64 %s
