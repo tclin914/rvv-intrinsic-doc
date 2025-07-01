@@ -40,7 +40,7 @@ NSEWS = [32]
 TYPES = ["bfloat"]
 
 llvm_header = r"""// REQUIRES: riscv-registered-target
-// RUN: %clang_cc1 -triple riscv64 -target-feature +v \
+// RUN: %clang_cc1 -triple riscv64 -target-feature +zve64x \
 // RUN:   -target-feature +zvfbfmin -disable-O0-optnone \
 // RUN:   -emit-llvm %s -o - | opt -S -passes=mem2reg | \
 // RUN:   FileCheck --check-prefix=CHECK-RV64 %s
